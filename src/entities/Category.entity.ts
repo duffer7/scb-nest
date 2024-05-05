@@ -1,8 +1,16 @@
-import { Entity, EntityDTO, EntityRepositoryType, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  EntityDTO,
+  EntityRepositoryType,
+  Index,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { ObjectId } from '@mikro-orm/mongodb';
 import { CategoryRepository } from 'src/categories/category.repository';
 
 @Entity({ repository: () => CategoryRepository })
+@Index({ properties: ['name', 'description'], type: 'text' })
 export class Category {
   [EntityRepositoryType]?: CategoryRepository;
   @PrimaryKey()

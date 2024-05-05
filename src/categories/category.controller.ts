@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -18,13 +20,18 @@ export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @Get()
-  async findAll(): Promise<ICategoriesRO> {
-    return this.categoryService.findAll();
+  async findAll(@Query() query: any): Promise<ICategoriesRO> {
+    return this.categoryService.findAll(query);
   }
 
   @Get(':idOrSlug')
   async findOne(@Param('idOrSlug') idOrSlug: string): Promise<ICategoryRO> {
     return this.categoryService.findOne(idOrSlug);
+  }
+
+  @Delete(':idOrSlug')
+  async deleteOne(@Param('idOrSlug') idOrSlug: string): Promise<number> {
+    return this.categoryService.deleteOne(idOrSlug);
   }
 
   @Patch(':idOrSlug')

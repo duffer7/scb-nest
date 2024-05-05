@@ -14,6 +14,7 @@ import { ConfigService } from '@nestjs/config';
         driver: MongoDriver,
         dbName: configService.get<string>('MONGODB_NAME'),
         clientUrl: configService.get<string>('MONGODB_URI'),
+        ensureIndexes: true,
       }),
       inject: [ConfigService],
     }),
