@@ -23,7 +23,7 @@ export class QueryCategoryDTO {
   @IsNumber()
   @Transform(({ value }) => (!Number.isNaN(Number(value)) ? (+value === 0 ? 1 : +value) : 1))
   @IsOptional()
-  readonly page?: number;
+  readonly page?: number = 1;
 
   @IsNumber()
   @Min(1)

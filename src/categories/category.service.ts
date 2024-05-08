@@ -22,7 +22,6 @@ export class CategoryService {
 
   async findAll(query: any): Promise<ICategoriesRO> {
     const { name, description, active, search, sort, page, pageSize } = query;
-    console.log(query);
     const where: any[] = [
       {
         $match: {},
@@ -58,7 +57,7 @@ export class CategoryService {
       };
     }
     const [count] = await this.categoryRepository.aggregate([...where, { $count: 'total' }]);
-    const categoriesTotal = count.total;
+    const categoriesTotal = count?.total || 0;
     if (page) {
       where.push(
         {
