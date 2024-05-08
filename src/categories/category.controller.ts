@@ -14,13 +14,15 @@ import { CreateCategoryDto } from '../dto/create-category.dto';
 import { CategoryService } from './category.service';
 import { ICategoriesRO, ICategoryRO } from './category.interface';
 import { UpdateCategoryDTO } from 'src/dto/update-category.dto';
+import { QueryCategoryDTO } from 'src/dto/query-category.dto';
 
 @Controller('category')
 export class CategoryController {
   constructor(private categoryService: CategoryService) {}
 
   @Get()
-  async findAll(@Query() query: any): Promise<ICategoriesRO> {
+  @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
+  async findAll(@Query() query: QueryCategoryDTO): Promise<ICategoriesRO> {
     return this.categoryService.findAll(query);
   }
 

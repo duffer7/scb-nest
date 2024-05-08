@@ -6,7 +6,6 @@ import { CreateCategoryDto } from 'src/dto/create-category.dto';
 import { ICategoriesRO, ICategoryRO } from './category.interface';
 import { buildSearchText, stringToBoolean } from 'src/utils';
 
-const CATEGORIES_PER_PAGE_DEFAULT = 2;
 @Injectable()
 export class CategoryService {
   constructor(
@@ -23,10 +22,7 @@ export class CategoryService {
 
   async findAll(query: any): Promise<ICategoriesRO> {
     const { name, description, active, search, sort, page, pageSize } = query;
-    const pageSizeComputed = !Number.isNaN(Number(pageSize))
-      ? +pageSize
-      : CATEGORIES_PER_PAGE_DEFAULT;
-    const pageComputed = !Number.isNaN(Number(page)) ? (+page === 0 ? 1 : +page) : 1;
+    console.log(query);
     const where: any[] = [
       {
         $match: {},
@@ -37,12 +33,10 @@ export class CategoryService {
     ];
     if (sort) {
       const key = sort.slice(0, 1) === '-' ? sort.substring(1) : sort;
-      if (Object.getOwnPropertyNames(Category.prototype).includes(key)) {
-        const direction = sort.slice(0, 1) === '-' ? -1 : 1;
-        where[1].$sort = {
-          [key]: direction,
-        };
-      }
+      const direction = sort.slice(0, 1) === '-' ? -1 : 1;
+      where[1].$sort = {
+        [key]: direction,
+      };
     }
     if (search) {
       where[0].$match.$text = {
@@ -65,27 +59,32 @@ export class CategoryService {
     }
     const [count] = await this.categoryRepository.aggregate([...where, { $count: 'total' }]);
     const categoriesTotal = count.total;
-    where.push(
-      {
-        $skip: (pageComputed - 1) * pageSizeComputed,
-      },
-      {
-        $limit: pageSizeComputed,
-      },
-    );
+    if (page) {
+      where.push(
+        {
+          $skip: (page - 1) * pageSize,
+        },
+        {
+          $limit: pageSize,
+        },
+      );
+    }
+    where.push({
+      $limit: pageSize,
+    });
     const categories = await this.categoryRepository.aggregate(where);
     return {
       categories: categories,
-      categoriesPerPage: pageSizeComputed,
+      categoriesPerPage: pageSize,
       categoriesTotal: categoriesTotal,
-      pagesTotal: Math.ceil(categoriesTotal / pageSizeComputed),
-      hasNext: pageSizeComputed * pageComputed < categoriesTotal,
-      hasPrevious: pageComputed > 1,
-      nextPage: pageComputed + 1,
-      previousPage: pageComputed - 1,
-      currentPage: pageComputed,
-      from: (pageComputed - 1) * pageSizeComputed + 1,
-      to: Math.min(pageComputed * pageSizeComputed, categoriesTotal),
+      pagesTotal: Math.ceil(categoriesTotal / pageSize),
+      hasNext: pageSize * page < categoriesTotal,
+      hasPrevious: page > 1,
+      nextPage: page + 1,
+      previousPage: page - 1,
+      currentPage: page,
+      from: (page - 1) * pageSize + 1,
+      to: Math.min(page * pageSize, categoriesTotal),
     };
   }
 

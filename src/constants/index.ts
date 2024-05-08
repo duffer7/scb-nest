@@ -1,0 +1,1 @@
+export const CATEGORIES_PER_PAGE_DEFAULT = 2;
